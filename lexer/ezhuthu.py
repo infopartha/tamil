@@ -22,7 +22,7 @@ class Letter:
 
     def show_attrs(self) -> None:
         """Shows the characteristics/attributes of the Letter"""
-        for key, val in self.attrs.items():
+        for key, val in self.attrs.items(): # pragma: no cover
             print(f'{key}\t: {val}')
 
 
@@ -58,7 +58,7 @@ class Ezhuthu(Letter):
                 self.coLetter = coLetter
                 self.ezhuthu += self.coLetter.ezhuthu
                 self.ucode += coLetter.ucode
-                self.vagai = coLetter.vagai if self.vagai != 'கிரந்தம்' else self.vagai
+                self.vagai = 'மெய்' if co_letter == '்' else (coLetter.vagai if self.vagai != 'கிரந்தம்' else self.vagai)
                 self.alavu = coLetter.alavu
 
     def __add__(self, other) -> str:
@@ -66,11 +66,13 @@ class Ezhuthu(Letter):
             return self.ezhuthu + other
         elif isinstance(other, Ezhuthu):
             return self.ezhuthu + other.ezhuthu
-        return self.ezhuthu + str(other)
+        return self.ezhuthu + str(other)  # pragma: no cover
 
     def __iadd__(self, other):
         if isinstance(other, str):
             other = Ezhuthu(other)
+        if not isinstance(other, Ezhuthu):
+            raise InvalidLetterAddition(self, message=f'The letter of type [{type(other)}] can not be added')
         if not self.coLetter and not other.thaniEzhuthu:
             self.__init__(self.ezhuthu + other.ezhuthu)
             return self
@@ -82,9 +84,10 @@ class Ezhuthu(Letter):
             return self.ezhuthu == other
         if isinstance(other, Ezhuthu):
             return self.ezhuthu == other.ezhuthu
-        return self.ezhuthu == str(other)
+        return self.ezhuthu == str(other)  # pragma: no cover
 
     def _get_valid_ezhuthu(self, letter, co_letter=None):
+        """Returns the valid first letter and its co letter if available"""
         l = len(letter)
         fe, ne = None, co_letter
         for i in range(l):
@@ -99,7 +102,7 @@ class Ezhuthu(Letter):
             raise NonTamilLetterException(letter)
         return fe, ne
 
-    def show_attrs(self) -> None:
+    def show_attrs(self) -> None: # pragma: no cover
         """Shows the characteristics/attributes of the Letter"""
         print(self.get_name())
         print(f'எழுத்து \t: {self.ezhuthu}')
@@ -114,25 +117,25 @@ class Ezhuthu(Letter):
 
     def get_name(self) -> str:
         """Returns the name of the Letter"""
+        if self.ezhuthu in tamil_ezhuthu:
+            return tamil_ezhuthu[self.ezhuthu]['name']
         out = self.ezhuthu
-        alavu, vagai = None, None
-        if self.ezhuthu == 'ஃ':
-            return 'ஆய்தம்'
+        alavu, vagai = self.alavu, self.vagai
+
         if self.coLetter:
             alavu = self.coLetter.alavu
             vagai = self.coLetter.vagai
-            if self.coLetter.vagai == 'ஒற்று':
+            if self.coLetter == '்':
                 out = self.letter
-        else:
-            alavu = self.alavu
-            vagai = self.vagai
+
         out += 'கார' if alavu == 'நெடில்' else 'கர'
-        out += ' ஒற்று' if vagai == 'ஒற்று' else 'ம்'
+        out += ' ஒற்று' if self.coLetter == '்' else 'ம்'
 
         return out
 
 
 class NonTamilEzhuthu(Letter):
+    """Class for Non Tamil Letters"""
     def __init__(self, letter) -> None:
         letter = letter[0]
         attrs = empty_char

@@ -3,12 +3,13 @@ class NonTamilLetterException(Exception):
     """Raised when the given character is not a Tamil letter/not in the Tamil aruchuvadi"""
     def __init__(self, letter=None, message=None) -> None:
         self.letter = letter
-        if not message and not letter:
-            self.message = 'இந்த எழுத்து தமிழ் எழுத்தல்ல\nThis letter is not a Tamil letter'
-        elif not message:
-            self.message = f'இந்த எழுத்து [{self.letter}] தமிழ் எழுத்தல்ல\nThis letter [{self.letter}] is not a Tamil letter'
-        else:
+        if message:
             self.message = message
+        elif letter:
+            self.message = f'இந்த எழுத்து [{self.letter}] தமிழ் எழுத்தல்ல.\nThis letter [{self.letter}] is not a Tamil letter'
+        else:
+            self.message = 'இந்த எழுத்து தமிழ் எழுத்தல்ல.\nThis letter is not a Tamil letter'
+
         super().__init__(self.message)
 
 

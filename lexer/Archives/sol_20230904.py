@@ -5,16 +5,8 @@ from .rules import asai_dict, seer_vaaipaadu_dict
 class Sol:
     """Class for Tamil Sol"""
     def __init__(self, word) -> None:
-        if isinstance(word, str):
-            self.word = word.strip()
-            self.letters = self._get_letters(self.word, [])
-        elif isinstance(word, Ezhuthu) or isinstance(word, NonTamilEzhuthu):
-            self.word = word.ezhuthu
-            self.letters = self._get_letters(self.word, [])
-        elif isinstance(word, list):
-            self._from_list(word)
-        else:
-            raise ValueError(f'{word} cannot be created as a Sol because of its type [{type(word)}]')
+        self.word = word.strip()
+        self.letters = self._get_letters(self.word, [])
 
     def __getitem__(self, index) -> Ezhuthu:
         return self.letters[index]
@@ -94,23 +86,6 @@ class Sol:
         letters = self._get_letters(self.word)
         self.letters = letters
 
-    def _from_list(self, ltr_list:list) -> None:
-        letters = []
-        for ltr in ltr_list:
-            if isinstance(ltr, Ezhuthu) or isinstance(ltr, NonTamilEzhuthu):
-                letters.append(ltr)
-            elif isinstance(ltr, str):
-                ltrs = self._get_letters(ltr.strip(), [])
-                letters.extend(ltrs)
-        self.letters = letters
-        self._update_from_letters()
-
-    def _refresh_attrs(self) -> None:
-        self.n_letters = len(self.letters)
-        self._extract_syllables()
-        self.n_syllables = len(self.asaigal)
-
-
     def charlength(self) -> int:
         """Returns the number of unicode characters in the word"""
         return len(self.word)
@@ -129,8 +104,8 @@ class Sol:
             self.letters.append(new_str)
         self._update_from_letters()
 
-    def _extract_syllables(self) -> list:
-        """Extracts syllables of the word"""
+    def asaigal(self) -> list:
+        """Returns syllables of the word"""
         out, cur = [], []
         for ltr in self.letters:
             if not cur:
@@ -145,17 +120,6 @@ class Sol:
         else:
             if cur:
                 out.append(cur)
-        self.asaigal = out
-    
-    def get_syllables(self):
-        """Returns syllables of the word"""
-        self._extract_syllables()
-        out = []
-        for syllable in self.asaigal:
-            i = ''
-            for ltr in syllable:
-                i += str(ltr)
-            out.append(i)
         return out
 
     def seer_vagai(self) -> str:
@@ -170,8 +134,7 @@ class Sol:
                 prev_alavu = alavu
             return out_list
 
-        self._extract_syllables()
-        asaigal = self.asaigal
+        asaigal = self.asaigal()
         out = []
         for asai in asaigal:
             alavugal_list = [ltr.alavu for ltr in asai]
@@ -189,8 +152,7 @@ class Sol:
         """Shows the characteristics/attributes of the Word"""
         print(self.word)
         print(f'மொத்த எழுத்துகள் \t: {len(self.letters)}')
-        print(f'மொத்த அசைகள் \t: {len(self.asaigal)}') # Add this to self.attrs
-        print(f'அசைகள் \t: {self.get_syllables()}') # Add this to self.attrs
+        print(f'மொத்த அசைகள் \t: {len(self.asaigal())}')
         print(f'சீர் வகை \t: {self.seer_vagai()}')
         seer_vaaipaadu = self.seer_vaaipaadu()
         if seer_vaaipaadu:
