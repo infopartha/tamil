@@ -120,5 +120,27 @@ class TestingSol(unittest.TestCase):
         assert(s8.seer_vaaipaadu() == 'தேமாந்தண்பூ')
         assert(s9.seer_vaaipaadu() == 'கருவிளநறுநிழல்')
 
+    def test_init_letter(self):
+        s10 = sol.Sol(self.e1)
+        assert(s10 == 'த')
+
+    def test_init_list_1(self):
+        s11 = sol.Sol([self.e1, self.e2, self.e3])
+        assert(s11 == 'தமிழ்')
+
+    def test_init_list_2(self):
+        s11 = sol.Sol(['த', 'மி', 'ழ்'])
+        assert(s11 == 'தமிழ்')
+
+    def test_init_exception(self):
+        with self.assertRaises(ValueError) as err_cntx:
+            s11 = sol.Sol(None)
+        assert('cannot be created as a Sol' in str(err_cntx.exception))
+
+    def test_get_syllables(self):
+        s9 = sol.Sol('அழகியதமிழ்மொழி')
+        assert(s9.get_syllables() == ['அழ', 'கிய', 'தமிழ்', 'மொழி'])
+
+
 if __name__ == '__main__':
     unittest.main()
